@@ -1,0 +1,98 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/ALU.hdl
+
+/**
+ * The ALU (Arithmetic Logic Unit).
+ * Computes one of the following functions:
+ * x+y, x-y, y-x, 0, 1, -1, x, y, -x, -y, !x, !y,
+ * x+1, y+1, x-1, y-1, x&y, x|y on two 16-bit inputs, 
+ * according to 6 input bits denoted zx,nx,zy,ny,f,no.
+ * In addition, the ALU computes two 1-bit outputs:
+ * if the ALU output == 0, zr is set to 1; otherwise zr is set to 0;
+ * if the ALU output < 0, ng is set to 1; otherwise ng is set to 0.
+ */
+
+// Implementation: the ALU logic manipulates the x and y inputs
+// and operates on the resulting values, as follows:
+// if (zx == 1) set x = 0        // 16-bit constant
+// if (nx == 1) set x = !x       // bitwise not
+// if (zy == 1) set y = 0        // 16-bit constant
+// if (ny == 1) set y = !y       // bitwise not
+// if (f == 1)  set out = x + y  // integer 2's complement addition
+// if (f == 0)  set out = x & y  // bitwise and
+// if (no == 1) set out = !out   // bitwise not
+// if (out == 0) set zr = 1
+// if (out < 0) set ng = 1
+
+CHIP ALU {
+    IN  
+        x[16], y[16],  // 16-bit inputs        
+        zx, // zero the x input?
+        nx, // negate the x input?
+        zy, // zero the y input?
+        ny, // negate the y input?
+        f,  // compute out = x + y (if 1) or x & y (if 0)
+        no; // negate the out output?
+
+    OUT 
+        out[16], // 16-bit output
+        zr, // 1 if (out == 0), 0 otherwise
+        ng; // 1 if (out < 0),  0 otherwise
+
+    PARTS:
+	Not16(in=x, out=notx);
+	//reverse x in every bit
+	And16(a=x, b=notx, out=zero16);
+	//zero16 is zero in 16 bits, 
+
+	Mux16(a=x, b=zero16, sel=zx, out=xAfterZx);
+	//set x as zero according to zx
+	//if zx==0, xAfterZx=x, else xAfterZx=0
+
+	Not16(in=xAfterZx, out=notXAfterZx);
+	//notXAfterZx=!xAfterZx
+	Mux16(a=xAfterZx, b=notXAfterZx, sel=nx, out=xAfterNx);
+	//negate x according to nx
+	//if nx==0, aAfterNx=aAfterZx, else xAfterNx=notXAfterZx
+
+	Mux16(a=y, b=zero16, sel=zy, out=yAfterZy);
+	//set y as zero according to zy
+	//if zy==0, yAfterZy=y, else yAfterZy=0
+	
+	Not16(in=yAfterZy, out=notYAfterZy);
+	//notYAfterZy=!yAfterZy
+	Mux16(a=yAfterZy, b=notYAfterZy, sel=ny, out=yAfterNy);
+	//negate y according to ny
+	//if ny==0, yAfterNy=yAfterZy, else yAfterNy=notYAfterZy
+
+	And16(a=xAfterNx, b=yAfterNy, out=xAndY);
+	//compute x & y
+	//xAndY is the result of 16 bit-wise And of xAfterNz and yAfterNy
+
+	Add16(a=xAfterNx, b=yAfterNy, out=xPlusY);
+	//compute x+y
+	//xPlusY is 
+	
+	Mux16(a=xAndY, b=xPlusY, sel=f, out=outAfterF);
+	//choose x+y or x&y
+	//if f==0, out=xPlusY, otherwise out=xAndY
+	
+	
+	Not16(in=outAfterF, out=notOutAfterF);
+	//notOutAfterF=!outAfterF
+	Mux16(a=outAfterF, b=notOutAfterF, sel=no, out=out, out[0..7]=firstEightAfterNo, out[8..15]=lastEightAfterNo, out[15]=ng);
+	//choose to negate the output according to no
+	//if no==0, outAfterNo=outAfterF, otherwise outAfterNo=!outAfterF
+
+	Or8Way(in=firstEightAfterNo, out=firstEight);
+	//firstEight=1 when there is a one or are ones in the first 8 bit of outAfterNo, else out=0
+	Or8Way(in=lastEightAfterNo, out=lastEight);
+	//lastEight=1 when there is a one or are ones in the first 8 bit of outAfterNo, else out=0
+	Or(a=firstEight, b=lastEight, out=isNotZero);
+	//isNotZero=0 when outAfterNo is 0, else isNotZero=1
+	Not(in=isNotZero, out=zr);
+	//zr=0 if isNotZero==1,else zr=0
+	//this is to see if the output is equal to zero
+}

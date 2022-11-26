@@ -1,0 +1,52 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/02/Inc16.hdl
+
+/**
+ * 16-bit incrementer:
+ * out = in + 1 (arithmetic addition)
+ */
+
+CHIP Inc16 {
+    IN in[16];
+    OUT out[16];
+
+    PARTS:
+	Not(in=in[0], out=notIn0);
+	//notIn0=!in[0]
+	Or(a=in[0],b=notIn0, out=one);
+	//one=in[0] or !in[0]=1
+	HalfAdder(a=in[0], b=one, sum=out[0], carry=carry1);
+	//out[0]=in[0] xor 1, carry1=in[0]*1
+	HalfAdder(a=in[1], b=carry1, sum=out[1], carry=carry2);
+	//out[1]=in[1] xor carry1, carry2=1*in[0]*in[1]
+	HalfAdder(a=in[2], b=carry2, sum=out[2], carry=carry3);
+	//out[2]=in[2] xor carry2, carry3=1*in[0]*in[1]*in[2]
+	HalfAdder(a=in[3], b=carry3, sum=out[3], carry=carry4);
+	//out[3]=in[3] xor carry3, carry4=1*in[0]*in[1]*in[2]*in[3]	
+	HalfAdder(a=in[4], b=carry4, sum=out[4], carry=carry5);
+	//out[4]=in[4] xor carry4, carry5=1*in[0]...*in[4]
+	HalfAdder(a=in[5], b=carry5, sum=out[5], carry=carry6);
+	//out[5]=in[5] xor carry5, carry6=1*in[0]...*in[5]
+	HalfAdder(a=in[6], b=carry6, sum=out[6], carry=carry7);
+	//out[6]=in[6] xor carry6, carry6=1*in[0]...*in[6]
+	HalfAdder(a=in[7], b=carry7, sum=out[7], carry=carry8);
+	//out[7]=in[7] xor carry7, carry7=1*in[0]...*in[7]
+	HalfAdder(a=in[8], b=carry8, sum=out[8], carry=carry9);
+	//out[8]=in[8] xor carry8, carry9=1*in[0]...*in[8]
+	HalfAdder(a=in[9], b=carry9, sum=out[9], carry=carry10);
+	//out[9]=in[9] xor carry9, carry10=1*in[0]*in[1]..*in[9]
+	HalfAdder(a=in[10], b=carry10, sum=out[10], carry=carry11);
+	//out[10]=in[10] xor carry10, carry11=1*in[0]*in[1]*in[2]..*in[10]	
+	HalfAdder(a=in[11], b=carry11, sum=out[11], carry=carry12);
+	//out[11]=in[11] xor carry11, carry12=1*in[0]...*in[11]
+	HalfAdder(a=in[12], b=carry12, sum=out[12], carry=carry13);
+	//out[12]=in[12] xor carry13, carry13=1*in[0]...*in[12]
+	HalfAdder(a=in[13], b=carry13, sum=out[13], carry=carry14);
+	//out[13]=in[13] xor carry13, carry14=1*in[0]...*in[13]
+	HalfAdder(a=in[14], b=carry14, sum=out[14], carry=carry15);
+	//out[14]=in[14] xor carry14, carry15=1*in[0]...*in[14]
+	Xor(a=in[15], b=carry15, out=out[15]);
+	//out[15]=in[15] xor carry15
+}
