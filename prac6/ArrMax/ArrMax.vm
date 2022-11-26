@@ -1,0 +1,75 @@
+// Contains a function ArrMax.arrMax that finds and returns the largest element in the array a of length b.
+// a & b are both supplied as arguments
+
+// Put your code here.
+// int arrMax(int * arr, int n){
+//	if(n<1){
+//		return -1;
+//	}
+//	int index=0;
+//	int max=arr[index];
+//	for(index=1;index<n;index++){
+//		if(arr[index]>max){
+//			max=arr[index];
+//		}
+//	}
+//	return max;
+//}
+
+//table
+// local 0|index	|
+// local 1|max		|
+
+//pointer 1--array
+
+function ArrMax.arrMax 2	// to be modified later
+push argument 0	//get the array's address
+pop pointer 1		//store array
+
+push argument 1	//get the array's length
+push constant 1	
+lt		
+if-goto ARRAY_LENGTH_EXCEPTION	//if length<1, go to ARRAY_LENGTH_EXCEPTION
+
+push that 0
+pop local 1	//max=arr[index]
+
+push constant 1
+pop local 0	//index=1
+
+label CHECK_INDEX
+push local 0	//get index
+push argument 1	//get n
+lt
+if-goto LOOP	//if index<n, loop
+goto END_LOOP	//else, end the loop
+
+label LOOP
+push argument 0	//get the base address of array
+push local 0		//get index
+add		
+pop pointer 1	//that 0= arr[index]
+push that 0	//push arr[index]
+push local 1	//push max
+gt
+if-goto CHANGE_MAX
+goto INDEX_PLUS_PLUS
+
+label CHANGE_MAX
+push that 0
+pop local 1	//max=arr[index]
+goto INDEX_PLUS_PLUS
+
+label INDEX_PLUS_PLUS
+push local 0
+push constant 1
+add
+pop local 0	//index++
+goto CHECK_INDEX
+
+label END_LOOP
+push local 1
+return
+
+label ARRAY_LENGTH_EXCEPTION
+return
