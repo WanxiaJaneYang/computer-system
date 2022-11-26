@@ -1,0 +1,38 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/03/a/RAM8.hdl
+
+/**
+ * Memory of 8 registers, each 16 bit-wide. Out holds the value
+ * stored at the memory location specified by address. If load==1, then 
+ * the in value is loaded into the memory location specified by address 
+ * (the loaded value will be emitted to out from the next time step onward).
+ */
+
+CHIP RAM8 {
+    IN in[16], load, address[3];
+    OUT out[16];
+
+    PARTS:
+	DMux8Way(in=load, sel=address, a=R1, b=R2, c=R3, d=R4, e=R5, f=R6,g=R7, h=R8);
+	//use the 8way dmux to choose the right register
+	Register(in=in, load=R1, out=R1Out);
+	//if R1==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R2, out=R2Out);
+	//if R2=1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R3, out=R3Out);
+	//if R3==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R4, out=R4Out);
+	//if R4==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R5, out=R5Out);
+	//if R5==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R6, out=R6Out);
+	//if R6==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R7, out=R7Out);
+	//if R7==1, load the in signal and emit into R1Out in the next clock period
+	Register(in=in, load=R8, out=R8Out);
+	//if R8==1, load the in signal and emit into R1Out in the next clock period
+	Mux8Way16(a=R1Out, b=R2Out, c=R3Out, d=R4Out, e=R5Out, f=R6Out, g=R7Out, h=R8Out, sel=address, out=out);
+	//use the Mux8Way16 to choose the right register's output
+}
