@@ -1,0 +1,133 @@
+// Calculates a = x*y
+// a is a local variable
+// x & y are static variables
+
+// Put your code here.
+
+
+// int x_abs(temp 0), y_abs(temp 1);
+// int abs_mult(temp 2);
+// x_abs=x>0?x:-x;
+// y_abs=y>0?y:-y;
+
+// if (x_abs<y_abs)
+//	swap(x_abs, y_abs)
+
+//abs_mult=0;
+//for(;y>0;y--){
+//	abs_mult+=x_abs;
+//}
+
+//if(x>0){
+//	if(y>0){
+//		return abs_mult;
+//	}else{
+//		return -abs_mult;
+//	}
+//}else{
+//	if(y>0){
+//		return -abs_mult;
+//	}
+//	else{
+//		return abs_mult;
+//	}
+//}
+
+push static 0	//push x
+push constant 0	//push 0
+gt	
+if-goto POSITIVE_X	//if x>0, go to the branch 
+push static 0
+neg
+pop temp 0	//abs_x=-x
+goto GET_ABS_Y		//continue to get abs_y
+
+label POSITIVE_X
+push static 0
+pop temp 0	//abs_x=x
+goto GET_ABS_Y
+
+label GET_ABS_Y
+push static 1
+push constant 0
+gt
+if-goto POSITIVE_Y	//if y>0
+push static 1
+neg
+pop temp 1	//abs_y=-y
+goto COMPARE_X_Y
+
+
+label POSITIVE_Y
+push static 1
+pop temp 1	//abs_y=y
+goto COMPARE_X_Y
+
+label COMPARE_X_Y
+push temp 0
+push temp 1
+lt 
+if-goto SWAP_ABS	//if abs_x<abs_y, goto swap(x, y)
+goto MULT_COMP		//else goto compute x*y
+
+label SWAP_ABS
+push temp 0
+push temp 1
+pop temp 0
+pop temp 1
+goto MULT_COMP
+
+label MULT_COMP
+push constant 0
+pop temp 2	// abs_mult=0;
+
+label CHECK_Y
+push temp 1	//push abs_y
+push constant 0	//push 0
+gt
+if-goto LOOP	//if abs_y>0, continue to loop
+goto END_LOOP	//if abs_y<=0, jump out of the loop
+
+label LOOP
+push temp 2	//push abs_mult
+push temp 0	//push abs_x
+add
+pop temp 2	//abs_mult=+=abs_x
+push temp 1	//push abs_y
+push constant 1	//push 1
+sub
+pop temp 1	//abs_y--
+goto CHECK_Y	//check if abs_y<=0
+
+label END_LOOP
+push static 0	//push x
+push constant 0	//push 0
+gt
+if-goto ONE_POS
+push static 1
+push constant 0
+gt
+if-goto DIFFERENT_SIGN	//if y>0 where x<=0, goto different sign branch
+goto SAME_SIGN	//otherwise goto same sign branch
+
+label ONE_POS
+push static 1
+push constant 0
+gt
+if-goto SAME_SIGN	//if y>0 where x>0, goto same sign branch
+goto DIFFERENT_SIGN
+
+label DIFFERENT_SIGN
+push temp 2	//push abs_mult
+neg
+pop local 0	//a=-abs_mult
+goto END
+
+label SAME_SIGN
+push temp 2	//push abs_mult
+pop local 0	//a=abs_mult
+goto END
+
+
+label END
+goto END	//END the program
